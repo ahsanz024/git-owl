@@ -46,6 +46,108 @@ function $(id) { return document.getElementById(id); }
 function show(id) { $(id).classList.remove('hidden'); }
 function hide(id) { $(id).classList.add('hidden'); }
 
+function isoHoursAgo(hoursAgo) {
+  return new Date(Date.now() - (hoursAgo * 60 * 60 * 1000)).toISOString();
+}
+
+function buildFallbackDemoData() {
+  return {
+    reviewRequests: {
+      issueCount: 5,
+      nodes: [
+        {
+          title: 'Improve onboarding checklist with smart defaults',
+          url: 'https://github.com/octo-org/retail-web/pull/1842',
+          repository: { nameWithOwner: 'octo-org/retail-web' },
+          createdAt: isoHoursAgo(2),
+          author: { login: 'maya-chen' },
+          reviews: { totalCount: 2 },
+          latestReviews: {
+            nodes: [{ state: 'COMMENTED' }, { state: 'APPROVED' }],
+          },
+        },
+        {
+          title: 'Fix checkout tax rounding mismatch for EU invoices',
+          url: 'https://github.com/octo-org/billing-service/pull/903',
+          repository: { nameWithOwner: 'octo-org/billing-service' },
+          createdAt: isoHoursAgo(5),
+          author: { login: 'dev-jordan' },
+          reviews: { totalCount: 1 },
+          latestReviews: {
+            nodes: [{ state: 'CHANGES_REQUESTED' }],
+          },
+        },
+        {
+          title: 'Add optimistic cache updates for issue assignment',
+          url: 'https://github.com/octo-org/platform-ui/pull/1211',
+          repository: { nameWithOwner: 'octo-org/platform-ui' },
+          createdAt: isoHoursAgo(9),
+          author: { login: 'samir-p' },
+          reviews: { totalCount: 3 },
+          latestReviews: {
+            nodes: [{ state: 'APPROVED' }, { state: 'COMMENTED' }],
+          },
+        },
+        {
+          title: 'Refactor webhook retry queue into worker pool',
+          url: 'https://github.com/octo-org/event-bus/pull/477',
+          repository: { nameWithOwner: 'octo-org/event-bus' },
+          createdAt: isoHoursAgo(17),
+          author: { login: 'renee-dev' },
+          reviews: { totalCount: 0 },
+          latestReviews: {
+            nodes: [],
+          },
+        },
+        {
+          title: 'Migrate flaky integration tests to deterministic fixtures',
+          url: 'https://github.com/octo-org/qa-tools/pull/332',
+          repository: { nameWithOwner: 'octo-org/qa-tools' },
+          createdAt: isoHoursAgo(26),
+          author: { login: 'eliot-bot' },
+          reviews: { totalCount: 2 },
+          latestReviews: {
+            nodes: [{ state: 'COMMENTED' }],
+          },
+        },
+      ],
+    },
+    myPRs: {
+      issueCount: 4,
+      nodes: [
+        {
+          title: 'Ship compact notifications panel for sidebar',
+          url: 'https://github.com/octo-org/platform-ui/pull/1222',
+          repository: { nameWithOwner: 'octo-org/platform-ui' },
+          createdAt: isoHoursAgo(3),
+          reviews: { totalCount: 3 },
+        },
+        {
+          title: 'Add pagination cursor helpers to API SDK',
+          url: 'https://github.com/octo-org/sdk-js/pull/619',
+          repository: { nameWithOwner: 'octo-org/sdk-js' },
+          createdAt: isoHoursAgo(7),
+          reviews: { totalCount: 1 },
+        },
+        {
+          title: 'Improve docs: deployment rollback runbook',
+          url: 'https://github.com/octo-org/docs/pull/248',
+          repository: { nameWithOwner: 'octo-org/docs' },
+          createdAt: isoHoursAgo(14),
+          reviews: { totalCount: 0 },
+        },
+        {
+          title: 'Reduce bundle size by lazy loading admin charts',
+          url: 'https://github.com/octo-org/retail-web/pull/1851',
+          repository: { nameWithOwner: 'octo-org/retail-web' },
+          createdAt: isoHoursAgo(32),
+          reviews: { totalCount: 2 },
+        },
+      ],
+    },
+  };
+}
+
 function relativeTime(dateStr) {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
@@ -172,7 +274,32 @@ async function main() {
   hide('error');
   hide('results');
 
-  const { token } = await chrome.storage.sync.get('token');
+  const { token, demoFeatureEnabled, demoMode, demoData } = await chrome.storage.sync.get([
+    'token',
+    'demoFeatureEnabled',
+    'demoMode',
+    'demoData',
+  ]);
+
+  if (demoFeatureEnabled && demoMode) {
+    const data = demoData || buildFallbackDemoData();
+
+    const reviewCount = data.reviewRequests.issueCount;
+    const myPRCount = data.myPRs.issueCount;
+
+    $('to-review-count').textContent = reviewCount;
+    $('my-prs-count').textContent = myPRCount;
+
+    renderPRList('to-review-list', data.reviewRequests.nodes, 'to-review');
+    renderPRList('my-prs-list', data.myPRs.nodes);
+
+    updateBadge(reviewCount + myPRCount);
+
+    hide('loading');
+    show('results');
+    $('status-text').textContent = 'Demo data mode';
+    return;
+  }
 
   if (!token) {
     hide('loading');

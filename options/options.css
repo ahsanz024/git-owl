@@ -72,6 +72,28 @@ h1 {
   margin-bottom: 0;
 }
 
+.demo-feature-group {
+  margin-top: 8px;
+}
+
+.demo-toggle-group {
+  margin-top: 8px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
 label {
   display: block;
   font-weight: 600;
@@ -124,6 +146,14 @@ select:focus {
   display: flex;
   gap: 8px;
   margin-top: 20px;
+}
+
+.demo-actions {
+  margin-top: 10px;
+}
+
+.demo-help {
+  margin-top: 10px;
 }
 
 .btn-primary {

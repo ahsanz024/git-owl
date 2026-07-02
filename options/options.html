@@ -32,6 +32,30 @@
         </select>
       </div>
 
+      <div class="form-group demo-feature-group">
+        <label class="checkbox-row" for="demo-feature-enabled">
+          <input type="checkbox" id="demo-feature-enabled">
+          <span>Enable Test mode</span>
+        </label>
+        <p class="help-text">Shows the Dummy data</p>
+      </div>
+
+      <div id="demo-controls" hidden>
+        <div class="form-group demo-toggle-group">
+          <label class="checkbox-row" for="demo-mode">
+            <input type="checkbox" id="demo-mode">
+            <span>Use fake demo data in popup</span>
+          </label>
+        </div>
+
+        <div class="actions demo-actions">
+          <button id="generate-demo-btn" class="btn-secondary">Generate Demo Data</button>
+          <button id="clear-demo-btn" class="btn-secondary">Clear Demo Data</button>
+        </div>
+
+        <p class="help-text demo-help">Demo mode bypasses live GitHub API calls and shows curated sample pull requests.</p>
+      </div>
+
       <div class="actions">
         <button id="save-btn" class="btn-primary">Save</button>
         <button id="test-btn" class="btn-secondary">Test Token</button>
