@@ -1,6 +1,10 @@
 const GITHUB_API = 'https://api.github.com/graphql';
 const $ = (id) => document.getElementById(id);
 
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+}
+
 function updateDemoControlsVisibility(enabled) {
   $('demo-controls').hidden = !enabled;
 }
@@ -140,20 +144,23 @@ async function saveToken() {
   const demoFeatureEnabled = $('demo-feature-enabled').checked;
   const demoMode = $('demo-mode').checked;
 
-  if (!demoFeatureEnabled) {
-    await chrome.storage.sync.set({ theme, token, demoFeatureEnabled, demoMode: false });
-    showMessage('Settings saved.', 'success');
-    return;
-  }
+  applyTheme(theme);
 
-  if (demoMode) {
-    await chrome.storage.sync.set({ token, theme, demoFeatureEnabled, demoMode });
-    showMessage('Settings saved. Demo mode is enabled.', 'success');
-    return;
-  }
+  const nextSettings = {
+    theme,
+    token,
+    demoFeatureEnabled,
+    demoMode: demoFeatureEnabled ? demoMode : false,
+  };
 
   if (!token) {
-    showMessage('Please enter a token.', 'error');
+    await chrome.storage.sync.set(nextSettings);
+    if (demoFeatureEnabled && demoMode) {
+      showMessage('Settings saved. Demo mode is enabled.', 'success');
+      return;
+    }
+
+    showMessage('Theme saved. Add a token when you want live GitHub data.', 'success');
     return;
   }
 
@@ -163,7 +170,7 @@ async function saveToken() {
   const result = await testToken(token);
 
   if (result.ok) {
-    await chrome.storage.sync.set({ token, theme, demoFeatureEnabled, demoMode });
+    await chrome.storage.sync.set(nextSettings);
     showMessage(`Token saved! Authenticated as ${result.login}.`, 'success');
   } else {
     showMessage(`Token test failed: ${result.msg}`, 'error');
@@ -212,6 +219,7 @@ async function loadSettings() {
   ]);
   if (token) $('token-input').value = token;
   if (theme) $('theme-select').value = theme;
+  applyTheme(theme || 'light');
   $('demo-feature-enabled').checked = Boolean(demoFeatureEnabled);
   $('demo-mode').checked = Boolean(demoMode);
   updateDemoControlsVisibility(Boolean(demoFeatureEnabled));
@@ -242,9 +250,14 @@ function handleDemoFeatureToggle() {
   }
 }
 
+function handleThemeChange(event) {
+  applyTheme(event.target.value);
+}
+
 document.addEventListener('DOMContentLoaded', loadSettings);
 $('save-btn').addEventListener('click', saveToken);
 $('test-btn').addEventListener('click', testTokenOnly);
 $('generate-demo-btn').addEventListener('click', generateDemoData);
 $('clear-demo-btn').addEventListener('click', clearDemoData);
 $('demo-feature-enabled').addEventListener('change', handleDemoFeatureToggle);
+$('theme-select').addEventListener('change', handleThemeChange);

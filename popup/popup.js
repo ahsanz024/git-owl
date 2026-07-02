@@ -46,6 +46,11 @@ function $(id) { return document.getElementById(id); }
 function show(id) { $(id).classList.remove('hidden'); }
 function hide(id) { $(id).classList.add('hidden'); }
 
+async function applySavedTheme() {
+  const { theme } = await chrome.storage.sync.get('theme');
+  document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+}
+
 function isoHoursAgo(hoursAgo) {
   return new Date(Date.now() - (hoursAgo * 60 * 60 * 1000)).toISOString();
 }
@@ -333,6 +338,7 @@ async function main() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  applySavedTheme();
   main();
   initTabs();
 });
