@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="header-content">
+        <span class="logo">&#9679;</span>
+        <h1>PR Review Tracker</h1>
+      </div>
+    </header>
+
+    <div id="content">
+      <div id="loading" class="state-message">
+        <div class="spinner"></div>
+        <p>Fetching PRs...</p>
+      </div>
+
+      <div id="no-token" class="state-message hidden">
+        <p class="emoji">&#128272;</p>
+        <p class="msg">No GitHub token configured.</p>
+        <button id="open-settings-btn" class="btn-primary">Open Settings</button>
+      </div>
+
+      <div id="error" class="state-message hidden">
+        <p class="emoji">&#9888;&#65039;</p>
+        <p class="msg" id="error-msg"></p>
+        <button id="retry-btn" class="btn-secondary">Retry</button>
+      </div>
+
+      <div id="results" class="hidden">
+        <div class="tab-bar" role="tablist">
+          <button class="tab active" data-tab="to-review" role="tab" aria-selected="true">
+            To Review <span id="to-review-count" class="tab-count"></span>
+          </button>
+          <button class="tab" data-tab="my-prs" role="tab" aria-selected="false">
+            My PRs <span id="my-prs-count" class="tab-count"></span>
+          </button>
+        </div>
+
+        <div class="tab-panel active" id="panel-to-review" role="tabpanel">
+          <ul id="to-review-list" class="pr-list"></ul>
+        </div>
+
+        <div class="tab-panel" id="panel-my-prs" role="tabpanel">
+          <ul id="my-prs-list" class="pr-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span id="status-text" class="status"></span>
+      <div class="footer-actions">
+        <button id="refresh-btn" class="btn-icon" title="Refresh">&#8635;</button>
+        <button id="settings-btn" class="btn-icon" title="Settings">&#9881;</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
