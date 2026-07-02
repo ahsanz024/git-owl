@@ -1,4 +1,4 @@
-# GitHub PR Review Tracker
+# GitOwl
 
 A Chrome extension that gives you a one-click overview of all pull requests awaiting your review, and your own PRs waiting for feedback.
 
